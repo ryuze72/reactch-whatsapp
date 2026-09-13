@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<title>ReactCh</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  padding:20px;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #123d27,
+      #070908 60%
+    );
+
+  color:white;
+}
+
+.card{
+  width:100%;
+  max-width:520px;
+
+  padding:26px;
+
+  background:#0e120f;
+
+  border:1px solid #26352c;
+
+  border-radius:24px;
+
+  box-shadow:
+    0 25px 80px #0009;
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.icon{
+  width:60px;
+  height:60px;
+
+  margin:auto;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:18px;
+
+  background:#25d366;
+
+  font-size:28px;
+}
+
+h1{
+  margin:12px 0 5px;
+}
+
+.subtitle{
+  color:#89938c;
+  font-size:13px;
+}
+
+label{
+  display:block;
+
+  margin-bottom:8px;
+
+  font-size:13px;
+
+  color:#cbd2cd;
+
+  font-weight:bold;
+}
+
+input{
+  width:100%;
+
+  padding:15px;
+
+  border-radius:13px;
+
+  border:1px solid #303b34;
+
+  background:#080b09;
+
+  color:white;
+
+  outline:none;
+}
+
+input:focus{
+  border-color:#25d366;
+}
+
+.emoji-title{
+  margin-top:20px;
+}
+
+.emojis{
+  display:grid;
+
+  grid-template-columns:
+    repeat(6,1fr);
+
+  gap:8px;
+}
+
+.emoji{
+  height:50px;
+
+  border-radius:12px;
+
+  border:1px solid #303b34;
+
+  background:#080b09;
+
+  font-size:22px;
+
+  cursor:pointer;
+}
+
+.emoji.active{
+  background:#123c23;
+
+  border-color:#25d366;
+}
+
+#send{
+  width:100%;
+
+  margin-top:22px;
+
+  padding:15px;
+
+  border:0;
+
+  border-radius:14px;
+
+  background:#25d366;
+
+  color:#06150b;
+
+  font-weight:bold;
+
+  cursor:pointer;
+}
+
+#send:disabled{
+  opacity:.5;
+}
+
+.status{
+  display:none;
+
+  margin-top:15px;
+
+  padding:13px;
+
+  border-radius:12px;
+
+  font-size:13px;
+}
+
+.status.show{
+  display:block;
+}
+
+.success{
+  background:#10351d;
+  color:#8af0aa;
+}
+
+.error{
+  background:#351316;
+  color:#ff9da3;
+}
+
+.loading{
+  display:none;
+
+  text-align:center;
+
+  margin-top:15px;
+
+  color:#929b95;
+
+  font-size:13px;
+}
+
+.loading.show{
+  display:block;
+}
+
+@media(max-width:400px){
+
+  .emojis{
+    grid-template-columns:
+      repeat(4,1fr);
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="logo">
+
+    <div class="icon">
+      ⚡
+    </div>
+
+    <h1>ReactCh</h1>
+
+    <div class="subtitle">
+      WhatsApp Channel Reaction Tool
+    </div>
+
+  </div>
+
+  <label>
+    URL Post WhatsApp Channel
+  </label>
+
+  <input
+    id="url"
+    type="url"
+    placeholder="https://whatsapp.com/channel/..."
+  >
+
+  <label class="emoji-title">
+    Pilih Emoji
+  </label>
+
+  <div class="emojis">
+
+    <button class="emoji"
+      data-e="👍">👍</button>
+
+    <button class="emoji"
+      data-e="❤️">❤️</button>
+
+    <button class="emoji"
+      data-e="😂">😂</button>
+
+    <button class="emoji"
+      data-e="😮">😮</button>
+
+    <button class="emoji"
+      data-e="😢">😢</button>
+
+    <button class="emoji"
+      data-e="🙏">🙏</button>
+
+    <button class="emoji"
+      data-e="🔥">🔥</button>
+
+    <button class="emoji"
+      data-e="👏">👏</button>
+
+    <button class="emoji"
+      data-e="😍">😍</button>
+
+    <button class="emoji"
+      data-e="🎉">🎉</button>
+
+    <button class="emoji"
+      data-e="💯">💯</button>
+
+    <button class="emoji"
+      data-e="🤩">🤩</button>
+
+  </div>
+
+  <button id="send">
+    Kirim Reaksi
+  </button>
+
+  <div
+    id="loading"
+    class="loading"
+  >
+    ⏳ Memproses...
+  </div>
+
+  <div
+    id="status"
+    class="status"
+  ></div>
+
+</div>
+
+<script>
+
+const selected = new Set();
+
+const url =
+  document.getElementById("url");
+
+const send =
+  document.getElementById("send");
+
+const loading =
+  document.getElementById("loading");
+
+const status =
+  document.getElementById("status");
+
+
+function showStatus(
+  text,
+  type
+){
+
+  status.textContent = text;
+
+  status.className =
+    "status show " + type;
+
+}
+
+
+function sessionID(){
+
+  const chars =
+    "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  let id = "zx_";
+
+  for(
+    let i = 0;
+    i < 16;
+    i++
+  ){
+
+    id += chars[
+      Math.floor(
+        Math.random() *
+        chars.length
+      )
+    ];
+
+  }
+
+  return id;
+
+}
+
+
+document
+.querySelectorAll(".emoji")
+.forEach(button => {
+
+  button.addEventListener(
+    "click",
+    () => {
+
+      const emoji =
+        button.dataset.e;
+
+      if(
+        selected.has(emoji)
+      ){
+
+        selected.delete(emoji);
+
+        button
+          .classList
+          .remove("active");
+
+      }else{
+
+        selected.add(emoji);
+
+        button
+          .classList
+          .add("active");
+
+      }
+
+    }
+  );
+
+});
+
+
+send.addEventListener(
+  "click",
+  async () => {
+
+    const postURL =
+      url.value.trim();
+
+    const reactions =
+      [...selected];
+
+    if(
+      !postURL ||
+      !postURL.includes(
+        "whatsapp.com/channel"
+      )
+    ){
+
+      showStatus(
+        "URL WhatsApp Channel tidak valid.",
+        "error"
+      );
+
+      return;
+    }
+
+    if(
+      reactions.length === 0
+    ){
+
+      showStatus(
+        "Pilih minimal satu emoji.",
+        "error"
+      );
+
+      return;
+    }
+
+    send.disabled = true;
+
+    loading.classList.add("show");
+
+    status.className = "status";
+
+    try{
+
+      /*
+       * Minta challenge
+       * dari backend kita sendiri.
+       */
+
+      const session =
+        sessionID();
+
+      const challengeResponse =
+        await fetch(
+          "/api/challenge"
+        );
+
+      const challenge =
+        await challengeResponse.json();
+
+      if(
+        !challenge.success
+      ){
+
+        throw new Error(
+          challenge.message ||
+          "Gagal mendapatkan challenge."
+        );
+
+      }
+
+      const ticket =
+        challenge.challenge?.ticket ||
+        challenge.ticket ||
+        challenge.challenge?.data?.ticket;
+
+      if(!ticket){
+
+        throw new Error(
+          "Ticket tidak ditemukan."
+        );
+
+      }
+
+      /*
+       * Kirim reaction
+       * melalui backend.
+       */
+
+      const response =
+        await fetch(
+          "/api/react",
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+
+              url:postURL,
+
+              reactions:reactions,
+
+              ticket:ticket,
+
+              sessionId:
+                challenge.sessionId ||
+                session
+
+            })
+
+          }
+        );
+
+      const result =
+        await response.json();
+
+      if(
+        !result.success
+      ){
+
+        throw new Error(
+          result.message ||
+          "Gagal mengirim reaksi."
+        );
+
+      }
+
+      showStatus(
+        "✅ " +
+        (
+          result.message ||
+          "Reaksi berhasil dikirim!"
+        ),
+        "success"
+      );
+
+    }catch(error){
+
+      showStatus(
+        "❌ " +
+        (
+          error.message ||
+          "Terjadi kesalahan."
+        ),
+        "error"
+      );
+
+    }finally{
+
+      send.disabled = false;
+
+      loading.classList.remove(
+        "show"
+      );
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
