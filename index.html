@@ -1,588 +1,492 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
->
-
-<title>ReactCh</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Ryuze — React Channel</title>
+<script>
+(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}
+if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme:light)").matches?"light":"dark";
+document.documentElement.setAttribute("data-theme",t)})()
+</script>
 <style>
+:root{
+  --bg:#0a0a14;--text:#fff;--text2:rgba(235,235,245,.62);--text3:rgba(235,235,245,.34);
+  --glass:rgba(255,255,255,.085);--glass2:rgba(255,255,255,.14);
+  --hi:rgba(255,255,255,.38);--lo:rgba(255,255,255,.06);--edge:rgba(255,255,255,.2);
+  --shadow:0 12px 40px rgba(0,0,0,.32);--blue:#0a84ff;--violet:#7d5cff;--green:#30d158;--red:#ff453a;
+  --b1:#5b4bff;--b2:#ff4f9a;--b3:#18c6ff;--spring:cubic-bezier(.22,1,.36,1);--soft:cubic-bezier(.4,0,.2,1);
+  --p1:rgba(255,255,255,.95);--p2:rgba(150,170,255,.85);--p3:rgba(255,190,225,.85)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html{background:var(--bg);overflow:hidden;height:100%;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{margin:0;height:100%;min-height:100%;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;text-rendering:optimizeLegibility;-webkit-user-select:none;user-select:none}
+button,input{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;-webkit-user-select:none;user-select:none}
+input{-webkit-user-select:text;user-select:text}
 
-*{
+/* Backdrop – gradient only, no blur filter */
+.liquid{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--bg)}
+.blob{position:absolute;border-radius:50%;opacity:.8;will-change:transform;pointer-events:none}
+.blob.a{width:460px;height:460px;background:radial-gradient(circle,var(--b1),transparent 68%);left:-90px;top:-60px;animation:d1 16s ease-in-out infinite alternate}
+.blob.b{width:420px;height:420px;background:radial-gradient(circle,var(--b2),transparent 68%);right:-100px;top:32%;animation:d2 19s ease-in-out infinite alternate}
+.blob.c{width:440px;height:440px;background:radial-gradient(circle,var(--b3),transparent 68%);left:10%;bottom:-120px;animation:d3 22s ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(120px,180px) scale(1.2)}}
+@keyframes d2{to{transform:translate(-140px,-120px) scale(.85)}}
+@keyframes d3{to{transform:translate(160px,-140px) scale(1.15)}}
+
+.glass{
+  position:relative;background:var(--glass);
+  box-shadow:inset 0 1.5px 0 var(--hi),inset 0 -1.5px 0 var(--lo),inset 0 0 0 .6px var(--edge),var(--shadow)
+}
+.app{width:min(100%,560px);margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 16px calc(36px + env(safe-area-inset-bottom))}
+
+.rise{opacity:0;transform:translateY(20px);animation:rise .7s var(--spring) forwards;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes rise{to{opacity:1;transform:none}}
+
+/* Top */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 16px 6px 6px;border-radius:999px}
+.logo{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#111;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35),0 6px 18px rgba(80,80,255,.4)}.logo img{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block}
+.brand b{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.brand small{display:block;color:var(--text2);font-size:11px;margin-top:1px}
+.tools{display:flex;align-items:center;gap:8px}
+.live{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;font-size:12px;font-weight:600;color:var(--text2)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(48,209,88,.5);animation:ping 2.5s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px transparent}}
+
+/* Hero */
+.hero{margin:0 6px 26px}
+.hero h1{margin:0;font-size:clamp(40px,11vw,56px);line-height:1;letter-spacing:-.042em;font-weight:700}
+.hero h1 span{display:block;background:linear-gradient(100deg,#fff,#b9a6ff 40%,#6cc4ff 70%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:12px 0 0;color:var(--text2);font-size:17px;line-height:1.42;max-width:440px;letter-spacing:-.012em}
+
+/* Panel */
+.panel{border-radius:40px;padding:20px 18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow:visible}
+.panel::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1.2px;background:linear-gradient(140deg,rgba(255,255,255,.5),transparent 28%,transparent 68%,rgba(255,255,255,.3));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.field-label{display:flex;justify-content:space-between;align-items:baseline;margin:0 6px 10px;font-size:16px;font-weight:650;letter-spacing:-.012em}
+.field-label small{color:var(--text2);font-weight:400;font-size:13px}
+
+.input{min-width:0;display:flex;align-items:center;gap:10px;height:58px;padding:0 10px 0 18px;border-radius:999px;background:rgba(0,0,0,.18);box-shadow:inset 0 2px 6px rgba(0,0,0,.22),inset 0 0 0 .6px var(--edge);transition:box-shadow .25s,transform .3s var(--spring)}
+.input:focus-within{transform:scale(1.015);box-shadow:inset 0 2px 6px rgba(0,0,0,.18),inset 0 0 0 1.5px var(--blue),0 0 0 5px rgba(10,132,255,.15)}
+.input span.ic{font-size:17px;opacity:.7}
+.input input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;font-size:16px;caret-color:var(--blue)}
+.input input::placeholder{color:var(--text3)}
+.clear{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--glass2);font-size:12px;font-weight:700;transform:scale(0);opacity:0;transition:transform .3s var(--spring),opacity .2s;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 var(--hi),inset 0 0 0 .6px var(--edge)}
+.clear.show{transform:scale(1);opacity:1}
+
+.reactions{margin-top:24px;overflow:visible}
+.count{padding:6px 12px;border-radius:999px;background:var(--glass2);font-size:12px;font-weight:600;color:var(--text2);display:inline-block;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 var(--hi),inset 0 0 0 .5px var(--edge)}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:8px;
+  padding:4px 2px 6px;
+  width:100%;
   box-sizing:border-box;
 }
-
-body{
-  margin:0;
-  min-height:100vh;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  padding:20px;
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  background:
-    radial-gradient(
-      circle at top,
-      #123d27,
-      #070908 60%
-    );
-
-  color:white;
-}
-
-.card{
-  width:100%;
-  max-width:520px;
-
-  padding:26px;
-
-  background:#0e120f;
-
-  border:1px solid #26352c;
-
-  border-radius:24px;
-
-  box-shadow:
-    0 25px 80px #0009;
-}
-
-.logo{
-  text-align:center;
-  margin-bottom:25px;
-}
-
-.icon{
-  width:60px;
-  height:60px;
-
-  margin:auto;
-
-  display:grid;
-  place-items:center;
-
-  border-radius:18px;
-
-  background:#25d366;
-
-  font-size:28px;
-}
-
-h1{
-  margin:12px 0 5px;
-}
-
-.subtitle{
-  color:#89938c;
-  font-size:13px;
-}
-
-label{
-  display:block;
-
-  margin-bottom:8px;
-
-  font-size:13px;
-
-  color:#cbd2cd;
-
-  font-weight:bold;
-}
-
-input{
-  width:100%;
-
-  padding:15px;
-
-  border-radius:13px;
-
-  border:1px solid #303b34;
-
-  background:#080b09;
-
-  color:white;
-
-  outline:none;
-}
-
-input:focus{
-  border-color:#25d366;
-}
-
-.emoji-title{
-  margin-top:20px;
-}
-
-.emojis{
-  display:grid;
-
-  grid-template-columns:
-    repeat(6,1fr);
-
-  gap:8px;
-}
-
 .emoji{
-  height:50px;
-
-  border-radius:12px;
-
-  border:1px solid #303b34;
-
-  background:#080b09;
-
-  font-size:22px;
-
-  cursor:pointer;
+  position:relative;aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:clamp(18px,5.5vw,24px);line-height:1;
+  width:100%;min-width:0;max-width:100%;
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  backdrop-filter:blur(16px) saturate(160%);
+  box-shadow:
+    inset 0 1.5px 0 var(--hi),
+    inset 0 -1.5px 0 var(--lo),
+    inset 0 0 0 .6px var(--edge),
+    0 2px 8px rgba(0,0,0,.1);
+  transition:transform .3s var(--spring),background .2s,box-shadow .2s;
+  overflow:hidden;
+  transform:none;
+  transform-origin:center center;
 }
-
+.emoji::before{
+  content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:linear-gradient(155deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.12) 32%,transparent 55%);
+  opacity:.7
+}
+.emoji:active{transform:scale(.88)}
 .emoji.active{
-  background:#123c23;
-
-  border-color:#25d366;
+  background:linear-gradient(150deg,rgba(125,92,255,.55),rgba(10,132,255,.4));
+  -webkit-backdrop-filter:blur(18px) saturate(180%);
+  backdrop-filter:blur(18px) saturate(180%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.6),
+    inset 0 -1px 0 rgba(255,255,255,.15),
+    inset 0 0 0 .6px rgba(255,255,255,.45),
+    0 4px 14px rgba(90,90,255,.35);
+  transform:scale(1.04);
+  z-index:1;
 }
-
-#send{
-  width:100%;
-
-  margin-top:22px;
-
-  padding:15px;
-
-  border:0;
-
-  border-radius:14px;
-
-  background:#25d366;
-
-  color:#06150b;
-
-  font-weight:bold;
-
-  cursor:pointer;
+.emoji.active::before{
+  background:linear-gradient(155deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.18) 35%,transparent 60%);
+  opacity:1
 }
+.emoji.active::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;box-shadow:0 0 12px 1px rgba(120,140,255,.3)}
+.emoji.pop{animation:pop .35s var(--spring)}
+@keyframes pop{0%{transform:scale(.75)}60%{transform:scale(1.08)}100%{transform:scale(1.04)}}
+.emoji.new{animation:ein .45s var(--spring)}
+@keyframes ein{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 
-#send:disabled{
-  opacity:.5;
+.custom{display:flex;gap:8px;margin-top:12px}
+.custom .input{flex:1;min-width:0;height:48px}
+.custom .input input{font-size:16px}
+.chip{
+  flex:0 0 auto;height:48px;padding:0 20px;border-radius:999px;font-weight:600;font-size:15px;
+  background:var(--glass2);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  backdrop-filter:blur(14px) saturate(150%);
+  box-shadow:inset 0 1.5px 0 var(--hi),inset 0 -1px 0 var(--lo),inset 0 0 0 .6px var(--edge),0 4px 12px rgba(0,0,0,.1);
+  transition:transform .3s var(--spring),box-shadow .25s;
+  position:relative;overflow:hidden
 }
-
-.status{
-  display:none;
-
-  margin-top:15px;
-
-  padding:13px;
-
-  border-radius:12px;
-
-  font-size:13px;
+.chip::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.35),transparent 45%)
 }
+.chip:active{transform:scale(.92)}
 
-.status.show{
-  display:block;
+.submit{
+  position:relative;overflow:hidden;width:100%;height:60px;margin-top:28px;border-radius:999px;
+  color:#fff;font-size:17px;font-weight:600;letter-spacing:-.012em;
+  background:linear-gradient(135deg,rgba(125,92,255,.75),rgba(10,132,255,.7));
+  -webkit-backdrop-filter:blur(18px) saturate(170%);
+  backdrop-filter:blur(18px) saturate(170%);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.55),
+    inset 0 -2px 8px rgba(0,0,40,.2),
+    inset 0 0 0 .6px rgba(255,255,255,.35),
+    0 12px 30px rgba(60,80,255,.4),
+    0 0 28px rgba(90,100,255,.2);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .3s var(--spring),filter .2s
 }
-
-.success{
-  background:#10351d;
-  color:#8af0aa;
+.submit::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.28) 0%,transparent 40%)
 }
+.submit::after{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:translateX(-170%) skewX(-20deg);animation:sh 4.5s ease-in-out infinite}
+@keyframes sh{0%,55%{transform:translateX(-170%) skewX(-20deg)}100%{transform:translateX(400%) skewX(-20deg)}}
+.submit:active{transform:scale(.96)}
+.submit:disabled{filter:saturate(.55) brightness(.9);cursor:default}
+.submit:disabled::after{display:none}
+.spinner{width:22px;height:22px;border-radius:50%;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .65s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.send-ic{filter:drop-shadow(0 0 5px rgba(255,214,70,.8));position:relative;z-index:1}
+#btnContent{position:relative;z-index:1;display:flex;align-items:center;gap:10px}
 
-.error{
-  background:#351316;
-  color:#ff9da3;
+.result{display:none;margin-top:16px;border-radius:34px;padding:18px}
+.result.show{display:block;animation:sheet .5s var(--spring)}
+@keyframes sheet{from{opacity:0;transform:translateY(30px) scale(.95)}}
+.r-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.r-ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px}
+.success .r-ic{background:linear-gradient(145deg,#4ae27a,var(--green));box-shadow:0 0 18px rgba(48,209,88,.5)}
+.error .r-ic{background:linear-gradient(145deg,#ff7a70,var(--red));box-shadow:0 0 18px rgba(255,69,58,.5)}
+.error.show{animation:sheet .5s var(--spring),shake .45s .12s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.r-title{font-size:17px;font-weight:600}
+.r-sub{color:var(--text2);font-size:13px;margin-top:1px}
+.response{max-height:220px;overflow:auto;padding:14px;border-radius:20px;background:rgba(0,0,0,.22);color:var(--text2);box-shadow:inset 0 2px 6px rgba(0,0,0,.2);white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;line-height:1.55}
+
+.footer{margin-top:28px;text-align:center;color:var(--text3);font-size:12px}
+
+.toast{position:fixed;z-index:60;left:50%;top:calc(10px + env(safe-area-inset-top));max-width:calc(100% - 28px);width:max-content;padding:14px 22px;border-radius:999px;font-size:15px;font-weight:600;transform:translate(-50%,-80px) scale(.5);opacity:0;pointer-events:none;transition:transform .5s var(--spring),opacity .2s;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.toast.show{transform:translate(-50%,0) scale(1);opacity:1}
+
+.fly{position:fixed;z-index:70;pointer-events:none;font-size:26px;animation:fly 1.3s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes fly{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}70%{opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.2) rotate(var(--r));opacity:0}}
+
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+@media(max-width:380px){.grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.emoji{font-size:clamp(16px,5vw,20px)}.live{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.rise{opacity:1;transform:none}}
+
+/* Theme toggle */
+.theme{position:relative;width:72px;height:40px;padding:0;border-radius:999px;transition:transform .3s var(--spring)}
+.theme:active{transform:scale(.92)}
+.thumb{position:absolute;top:4px;left:4px;width:32px;height:32px;border-radius:50%;background:var(--thumb,#fff);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 4px 12px rgba(0,0,0,.3);transition:transform .5s var(--spring),background .3s}
+html[data-theme="dark"] .thumb{transform:translateX(32px)}
+.theme .i{position:absolute;top:11px;width:18px;height:18px;color:var(--text2);transition:color .25s,transform .5s var(--spring)}
+.theme .sun{left:11px}.theme .moon{right:11px}
+html[data-theme="dark"] .theme .moon{color:#000;transform:rotate(-15deg) scale(1.05)}
+html[data-theme="light"] .theme .sun{color:#fff;transform:rotate(80deg) scale(1.05)}
+html.theming,html.theming body,html.theming .liquid,html.theming .blob,html.theming .glass,html.theming .panel,html.theming .panel::after,html.theming .brand,html.theming .live,html.theming .theme,html.theming .logo,html.theming .hero h1 span,html.theming .hero p,html.theming .input,html.theming .emoji,html.theming .emoji.active,html.theming .emoji::before,html.theming .emoji.active::after,html.theming .chip,html.theming .submit,html.theming .submit::before,html.theming .submit::after,html.theming .result,html.theming .response,html.theming .count,html.theming .clear,html.theming .footer,html.theming .field-label,html.theming .field-label small,html.theming .brand b,html.theming .brand small,html.theming .r-title,html.theming .r-sub,html.theming .r-ic,html.theming .dot,html.theming .dot::after{
+  transition:background .6s var(--soft),background-color .6s var(--soft),background-image .6s var(--soft),color .6s var(--soft),box-shadow .6s var(--soft),border-color .6s var(--soft),opacity .6s var(--soft),filter .6s var(--soft),caret-color .6s var(--soft)!important
 }
+html.theming .thumb{transition:transform .6s var(--spring),background .5s var(--soft)!important}
+html.theming .toast{transition:transform .55s var(--spring),opacity .3s var(--soft),background .6s var(--soft),color .6s var(--soft),box-shadow .6s var(--soft)!important}
 
-.loading{
-  display:none;
+/* Dark */
+html[data-theme="dark"]{--bg:#000;--text:#fff;--blue:#fff;--b1:#34343c;--b2:#202026;--b3:#44444e;--thumb:#fff;--glass:rgba(255,255,255,.075);--glass2:rgba(255,255,255,.13);--p1:rgba(255,255,255,.9);--p2:rgba(150,170,255,.8);--p3:rgba(255,190,225,.8)}
+html[data-theme="dark"] .blob{opacity:.75}
+html[data-theme="dark"] .logo{background:linear-gradient(145deg,#fff,#a4a4ae);color:#000;box-shadow:inset 0 1.5px 0 #fff,0 6px 16px rgba(255,255,255,.15)}
+html[data-theme="dark"] .hero h1 span{background-image:linear-gradient(100deg,#fff,#8e8e98 45%,#fff 80%)}
+html[data-theme="dark"] .input{background:rgba(255,255,255,.06);box-shadow:inset 0 2px 6px rgba(0,0,0,.4),inset 0 0 0 .6px var(--edge)}
+html[data-theme="dark"] .input:focus-within{box-shadow:inset 0 2px 6px rgba(0,0,0,.35),inset 0 0 0 1.5px #fff,0 0 0 5px rgba(255,255,255,.1)}
+html[data-theme="dark"] .emoji{background:rgba(255,255,255,.08);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.25),inset 0 -1.5px 0 rgba(0,0,0,.3),inset 0 0 0 .6px rgba(255,255,255,.12),0 4px 14px rgba(0,0,0,.3)}
+html[data-theme="dark"] .emoji.active{background:linear-gradient(150deg,rgba(255,255,255,.28),rgba(255,255,255,.08));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 0 0 .6px rgba(255,255,255,.4),0 6px 20px rgba(255,255,255,.12),0 0 20px rgba(255,255,255,.08)}
+html[data-theme="dark"] .emoji.active::after{box-shadow:0 0 14px 2px rgba(255,255,255,.22)}
+html[data-theme="dark"] .chip{background:rgba(255,255,255,.1)}
+html[data-theme="dark"] .submit{color:#000;background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(200,200,210,.85));box-shadow:inset 0 2px 0 #fff,inset 0 -2px 8px rgba(0,0,0,.12),inset 0 0 0 .6px rgba(255,255,255,.5),0 12px 30px rgba(255,255,255,.15),0 0 24px rgba(255,255,255,.1)}
+html[data-theme="dark"] .submit::after{background:linear-gradient(100deg,transparent,rgba(0,0,0,.1),transparent)}
+html[data-theme="dark"] .submit::before{background:linear-gradient(160deg,rgba(255,255,255,.4) 0%,transparent 40%)}
+html[data-theme="dark"] .spinner{border-color:rgba(0,0,0,.2);border-top-color:#000}
+html[data-theme="dark"] .response{background:rgba(255,255,255,.06)}
+html[data-theme="dark"] .brand,html[data-theme="dark"] .live,html[data-theme="dark"] .theme{background:rgba(255,255,255,.1)}
+html[data-theme="dark"] .result{background:rgba(30,30,36,.9)}
+html[data-theme="dark"] .panel::after{background:linear-gradient(140deg,rgba(255,255,255,.35),transparent 28%,transparent 68%,rgba(255,255,255,.2))}
 
-  text-align:center;
-
-  margin-top:15px;
-
-  color:#929b95;
-
-  font-size:13px;
-}
-
-.loading.show{
-  display:block;
-}
-
-@media(max-width:400px){
-
-  .emojis{
-    grid-template-columns:
-      repeat(4,1fr);
-  }
-
-}
-
+/* Light */
+html[data-theme="light"]{--bg:#ebebf0;--text:#000;--text2:rgba(0,0,0,.62);--text3:rgba(0,0,0,.4);--blue:#000;--b1:#d4d8ea;--b2:#e2dbe9;--b3:#cddae6;--thumb:#000;--glass:rgba(244,244,248,.55);--glass2:rgba(0,0,0,.06);--hi:rgba(255,255,255,.75);--lo:rgba(0,0,0,.05);--edge:rgba(0,0,0,.09);--shadow:0 12px 40px rgba(0,0,0,.1);--p1:rgba(110,120,255,.7);--p2:rgba(255,120,180,.65);--p3:rgba(70,185,255,.7)}
+html[data-theme="light"] .liquid{background:radial-gradient(120% 55% at 50% 0%,#f6f6fa,transparent 70%),radial-gradient(90% 40% at 50% 100%,#e0e1ea,transparent 70%),var(--bg)}
+html[data-theme="light"] .blob{opacity:.7}
+html[data-theme="light"] .logo{background:linear-gradient(145deg,#38383d,#000);color:#fff;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.25),0 6px 16px rgba(0,0,0,.25)}
+html[data-theme="light"] .hero h1 span{background-image:linear-gradient(100deg,#000,#80808a 45%,#000 80%)}
+html[data-theme="light"] .panel{background:linear-gradient(150deg,rgba(255,255,255,.6),rgba(255,255,255,.25));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9),inset 0 -1.5px 0 rgba(255,255,255,.25),inset 0 0 0 .6px rgba(255,255,255,.45),0 2px 4px rgba(30,30,60,.04),0 14px 30px rgba(30,30,70,.08),0 36px 70px rgba(30,30,60,.1)}
+html[data-theme="light"] .emoji{background:rgba(255,255,255,.45);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -1.5px 0 rgba(0,0,0,.04),inset 0 0 0 .6px rgba(0,0,0,.08),0 4px 14px rgba(30,30,60,.08)}
+html[data-theme="light"] .emoji.active{background:linear-gradient(160deg,rgba(40,40,48,.72),rgba(10,10,14,.78));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 0 0 .6px rgba(255,255,255,.2),0 4px 14px rgba(0,0,0,.18);transform:scale(1.04)}
+html[data-theme="light"] .emoji.active::after{box-shadow:0 0 14px 2px rgba(0,0,0,.15)}
+html[data-theme="light"] .input{background:rgba(255,255,255,.5);box-shadow:inset 0 1.5px 4px rgba(30,30,60,.07),inset 0 0 0 .6px rgba(0,0,0,.07)}
+html[data-theme="light"] .input:focus-within{box-shadow:inset 0 1.5px 4px rgba(30,30,60,.05),inset 0 0 0 1.5px #000,0 0 0 5px rgba(0,0,0,.06)}
+html[data-theme="light"] .chip{background:rgba(255,255,255,.5);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9),inset 0 0 0 .6px rgba(0,0,0,.07),0 4px 12px rgba(30,30,60,.08)}
+html[data-theme="light"] .submit{background:linear-gradient(180deg,rgba(42,42,48,.88),rgba(8,8,12,.92));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.3),inset 0 -2px 8px rgba(0,0,0,.2),inset 0 0 0 .6px rgba(255,255,255,.14),0 12px 28px rgba(0,0,0,.28),0 0 24px rgba(0,0,0,.12)}
+html[data-theme="light"] .submit::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.2),transparent)}
+html[data-theme="light"] .submit::before{background:linear-gradient(160deg,rgba(255,255,255,.22) 0%,transparent 40%)}
+html[data-theme="light"] .response{background:rgba(0,0,0,.04)}
+html[data-theme="light"] .brand,html[data-theme="light"] .live,html[data-theme="light"] .theme{background:rgba(255,255,255,.6)}
+html[data-theme="light"] .result{background:rgba(250,250,253,.85)}
 </style>
-
 </head>
-
 <body>
+<div class="liquid" aria-hidden="true"><i class="blob a"></i><i class="blob b"></i><i class="blob c"></i></div>
 
-<div class="card">
+<main class="app">
+  <header class="top rise" style="--i:0">
+    <div class="brand glass">
+      <div class="logo"><img src="pp.jpg" alt="" width="40" height="40"></div>
+      <div><b>Ryuze</b><small>React Channel · 500 emoji</small></div>
+    </div>
+    <div class="tools">
+      <div class="live glass"><i class="dot"></i>Online</div>
+      <button class="theme glass" id="themeBtn" aria-label="Ganti tema gelap/cerah" aria-pressed="true">
+        <span class="thumb"></span>
+        <svg class="i sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="i moon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+      </button>
+    </div>
+  </header>
 
-  <div class="logo">
+  <section class="hero rise" style="--i:1">
+    <h1>React postingan<span>saluranmu.</span></h1>
+    <p>Tempel link postingan WhatsApp Channel, pilih emoji, lalu kirim. Sistem akan mengirim hingga <b style="color:inherit;font-weight:650">500 reaction</b> dalam satu ketukan.</p>
+  </section>
 
-    <div class="icon">
-      ⚡
+  <section class="panel glass rise" style="--i:2">
+    <div class="field-label">Link postingan <small>WhatsApp Channel</small></div>
+    <div class="input">
+      <span class="ic">🔗</span>
+      <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tempel link di sini…">
+      <button class="clear" id="clearUrl" aria-label="Hapus">✕</button>
     </div>
 
-    <h1>ReactCh</h1>
-
-    <div class="subtitle">
-      WhatsApp Channel Reaction Tool
+    <div class="reactions">
+      <div class="field-label">Reaction <span class="count" id="emojiCount">4 / 5 dipilih</span></div>
+      <div class="grid" id="emojiGrid">
+        <button class="emoji active" data-emoji="🥳">🥳</button>
+        <button class="emoji active" data-emoji="👍">👍</button>
+        <button class="emoji active" data-emoji="❤️">❤️</button>
+        <button class="emoji active" data-emoji="🔥">🔥</button>
+        <button class="emoji" data-emoji="😂">😂</button>
+        <button class="emoji" data-emoji="😍">😍</button>
+        <button class="emoji" data-emoji="😮">😮</button>
+        <button class="emoji" data-emoji="😢">😢</button>
+        <button class="emoji" data-emoji="👏">👏</button>
+        <button class="emoji" data-emoji="💯">💯</button>
+        <button class="emoji" data-emoji="🙏">🙏</button>
+        <button class="emoji" data-emoji="🚀">🚀</button>
+      </div>
+      <div class="custom">
+        <div class="input"><input id="customEmoji" type="text" maxlength="12" placeholder="Atau ketik emoji lain"></div>
+        <button class="chip" id="addEmoji">Tambah</button>
+      </div>
     </div>
 
-  </div>
+    <button class="submit" id="reactBtn"><span id="btnContent"><span class="send-ic">⚡</span> Kirim 500 reaction</span></button>
+  </section>
 
-  <label>
-    URL Post WhatsApp Channel
-  </label>
+  <section class="result glass" id="result">
+    <div class="r-top">
+      <div class="r-ic" id="resultIcon">✓</div>
+      <div><div class="r-title" id="resultTitle">Berhasil</div><div class="r-sub">Respons server</div></div>
+    </div>
+    <div class="response" id="resultBody"></div>
+  </section>
 
-  <input
-    id="url"
-    type="url"
-    placeholder="https://whatsapp.com/channel/..."
-  >
-
-  <label class="emoji-title">
-    Pilih Emoji
-  </label>
-
-  <div class="emojis">
-
-    <button class="emoji"
-      data-e="👍">👍</button>
-
-    <button class="emoji"
-      data-e="❤️">❤️</button>
-
-    <button class="emoji"
-      data-e="😂">😂</button>
-
-    <button class="emoji"
-      data-e="😮">😮</button>
-
-    <button class="emoji"
-      data-e="😢">😢</button>
-
-    <button class="emoji"
-      data-e="🙏">🙏</button>
-
-    <button class="emoji"
-      data-e="🔥">🔥</button>
-
-    <button class="emoji"
-      data-e="👏">👏</button>
-
-    <button class="emoji"
-      data-e="😍">😍</button>
-
-    <button class="emoji"
-      data-e="🎉">🎉</button>
-
-    <button class="emoji"
-      data-e="💯">💯</button>
-
-    <button class="emoji"
-      data-e="🤩">🤩</button>
-
-  </div>
-
-  <button id="send">
-    Kirim Reaksi
-  </button>
-
-  <div
-    id="loading"
-    class="loading"
-  >
-    ⏳ Memproses...
-  </div>
-
-  <div
-    id="status"
-    class="status"
-  ></div>
-
-</div>
+  <div class="footer rise" style="--i:3">Ryuze · React Channel</div>
+</main>
+<div class="toast glass" id="toast"></div>
 
 <script>
+const API_URL="https://api.rech.v2.zfile.web.id/api/v1/react";
+const API_KEY="zx_3e9a87c22fbeb0df0def0752dfb7e0dc";
+const $=id=>document.getElementById(id);
+const urlInput=$("url"),clearUrl=$("clearUrl"),reactBtn=$("reactBtn"),btnContent=$("btnContent"),
+  result=$("result"),resultIcon=$("resultIcon"),resultTitle=$("resultTitle"),resultBody=$("resultBody"),
+  toast=$("toast"),emojiGrid=$("emojiGrid"),emojiCount=$("emojiCount"),
+  customEmoji=$("customEmoji"),addEmoji=$("addEmoji");
 
-const selected = new Set();
+const MAX_EMOJI=5;
+const selected=new Set(["🥳","👍","❤️","🔥"]);
+const reduceMotion=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const tap=()=>{try{navigator.vibrate?.(8)}catch{}};
 
-const url =
-  document.getElementById("url");
-
-const send =
-  document.getElementById("send");
-
-const loading =
-  document.getElementById("loading");
-
-const status =
-  document.getElementById("status");
-
-
-function showStatus(
-  text,
-  type
-){
-
-  status.textContent = text;
-
-  status.className =
-    "status show " + type;
-
+function updateCount(){
+  emojiCount.textContent=selected.size+" / "+MAX_EMOJI+" dipilih";
 }
 
-
-function sessionID(){
-
-  const chars =
-    "abcdefghijklmnopqrstuvwxyz0123456789";
-
-  let id = "zx_";
-
-  for(
-    let i = 0;
-    i < 16;
-    i++
-  ){
-
-    id += chars[
-      Math.floor(
-        Math.random() *
-        chars.length
-      )
-    ];
-
-  }
-
-  return id;
-
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(()=>toast.classList.remove("show"),2400);
 }
 
-
-document
-.querySelectorAll(".emoji")
-.forEach(button => {
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      const emoji =
-        button.dataset.e;
-
-      if(
-        selected.has(emoji)
-      ){
-
-        selected.delete(emoji);
-
-        button
-          .classList
-          .remove("active");
-
-      }else{
-
-        selected.add(emoji);
-
-        button
-          .classList
-          .add("active");
-
-      }
-
+function bindEmoji(b){
+  b.addEventListener("click",()=>{
+    const e=b.dataset.emoji;
+    if(selected.has(e)){selected.delete(e);b.classList.remove("active")}
+    else{
+      if(selected.size>=MAX_EMOJI){showToast("Maksimal "+MAX_EMOJI+" emoji.");return}
+      selected.add(e);b.classList.add("active");
+      if(!reduceMotion){b.classList.remove("pop");void b.offsetWidth;b.classList.add("pop")}
     }
-  );
+    tap();updateCount();
+  });
+}
+document.querySelectorAll(".emoji").forEach(bindEmoji);
+updateCount();
 
+urlInput.addEventListener("input",()=>clearUrl.classList.toggle("show",!!urlInput.value));
+clearUrl.addEventListener("click",()=>{urlInput.value="";clearUrl.classList.remove("show");urlInput.focus()});
+
+function addCustom(){
+  const v=customEmoji.value.trim();
+  if(!v){showToast("Masukkan emoji dulu.");customEmoji.focus();return}
+  if(selected.has(v)){showToast("Emoji itu sudah dipilih.");customEmoji.value="";return}
+  if(selected.size>=MAX_EMOJI){showToast("Maksimal "+MAX_EMOJI+" emoji.");return}
+  selected.add(v);
+  const b=document.createElement("button");
+  b.className="emoji active"+(reduceMotion?"":" new");
+  b.dataset.emoji=v;b.textContent=v;
+  emojiGrid.appendChild(b);bindEmoji(b);
+  customEmoji.value="";updateCount();showToast("Emoji ditambahkan.");
+}
+addEmoji.addEventListener("click",addCustom);
+customEmoji.addEventListener("keydown",e=>{if(e.key==="Enter")addCustom()});
+
+function setLoading(on){
+  reactBtn.disabled=on;
+  btnContent.innerHTML=on?'<span class="spinner"></span>':'<span class="send-ic">⚡</span> Kirim 500 reaction';
+}
+
+function showResult(ok,msg){
+  result.classList.remove("success","error","show");
+  void result.offsetWidth;
+  result.classList.add(ok?"success":"error","show");
+  resultIcon.textContent=ok?"✓":"!";
+  resultTitle.textContent=ok?"Berhasil":"Gagal";
+  resultBody.textContent=msg;
+  setTimeout(()=>result.scrollIntoView({behavior:"smooth",block:"nearest"}),60);
+}
+
+function burst(){
+  if(reduceMotion||!selected.size)return;
+  const r=reactBtn.getBoundingClientRect(),list=[...selected];
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<12;i++){
+    const s=document.createElement("span");
+    s.className="fly";s.textContent=list[i%list.length];
+    s.style.cssText=`left:${r.left+r.width/2}px;top:${r.top+r.height/2}px;--dx:${Math.cos(Math.PI*(1.1+Math.random()*.8))*(80+Math.random()*130)}px;--dy:${Math.sin(Math.PI*(1.1+Math.random()*.8))*(80+Math.random()*130)*1.4}px;--r:${Math.random()*100-50}deg;animation-delay:${Math.random()*.12}s`;
+    frag.appendChild(s);
+    setTimeout(()=>s.remove(),1500);
+  }
+  document.body.appendChild(frag);
+}
+
+function friendlyError(err){
+  if(!navigator.onLine)return"Tidak ada koneksi internet.";
+  const m=err?.message||"";
+  if(/Failed to fetch|NetworkError|Load failed/i.test(m)){
+    return"Browser gagal menghubungi API.\nKemungkinan:\n• CORS API tidak mengizinkan browser\n• Endpoint sedang offline\n• API key tidak valid\n• Koneksi internet bermasalah\nJika masalahnya CORS, gunakan backend/proxy.";
+  }
+  return m||"Terjadi kesalahan yang tidak diketahui.";
+}
+
+async function sendReaction(){
+  const url=urlInput.value.trim();
+  if(!url){showToast("Masukkan link WhatsApp Channel.");urlInput.focus();return}
+  let parsed;
+  try{parsed=new URL(url)}catch{showToast("URL tidak valid.");urlInput.focus();return}
+  if(!parsed.hostname.includes("whatsapp.com")){showToast("Gunakan link dari WhatsApp Channel.");return}
+  if(!selected.size){showToast("Pilih minimal satu emoji.");return}
+
+  setLoading(true);
+  result.classList.remove("show");
+  try{
+    const res=await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":API_KEY},
+      body:JSON.stringify({url,emojis:[...selected].join(",")})
+    });
+    const raw=await res.text();
+    let data;try{data=JSON.parse(raw)}catch{data=raw}
+    const pretty=typeof data==="string"?data:JSON.stringify(data,null,2);
+    if(!res.ok)throw new Error(pretty);
+    showResult(true,pretty);showToast("Reaction berhasil dikirim.");burst();
+  }catch(err){
+    console.error("React CH error:",err);
+    showResult(false,friendlyError(err));showToast("Gagal mengirim reaction.");
+  }finally{setLoading(false)}
+}
+
+reactBtn.addEventListener("click",sendReaction);
+urlInput.addEventListener("keydown",e=>{if(e.key==="Enter")sendReaction()});
+
+/* Theme */
+const root=document.documentElement,themeBtn=$("themeBtn"),metaTheme=document.querySelector('meta[name="theme-color"]');
+let themeTimer;
+function applyTheme(t,save,animate){
+  if(animate){root.classList.add("theming");clearTimeout(themeTimer);themeTimer=setTimeout(()=>root.classList.remove("theming"),500)}
+  root.setAttribute("data-theme",t);
+  metaTheme.content=t==="dark"?"#000000":"#ebebf0";
+  themeBtn.setAttribute("aria-pressed",String(t==="dark"));
+  if(save){try{localStorage.setItem("theme",t)}catch{}}
+}
+themeBtn.addEventListener("click",()=>{
+  const t=root.dataset.theme==="dark"?"light":"dark";
+  applyTheme(t,true,true);tap();showToast(t==="dark"?"Mode gelap aktif":"Mode cerah aktif");
 });
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",e=>{
+  let s=null;try{s=localStorage.getItem("theme")}catch{}
+  if(!s)applyTheme(e.matches?"dark":"light",false,true);
+});
+applyTheme(root.dataset.theme,false,false);
 
-
-send.addEventListener(
-  "click",
-  async () => {
-
-    const postURL =
-      url.value.trim();
-
-    const reactions =
-      [...selected];
-
-    if(
-      !postURL ||
-      !postURL.includes(
-        "whatsapp.com/channel"
-      )
-    ){
-
-      showStatus(
-        "URL WhatsApp Channel tidak valid.",
-        "error"
-      );
-
-      return;
-    }
-
-    if(
-      reactions.length === 0
-    ){
-
-      showStatus(
-        "Pilih minimal satu emoji.",
-        "error"
-      );
-
-      return;
-    }
-
-    send.disabled = true;
-
-    loading.classList.add("show");
-
-    status.className = "status";
-
-    try{
-
-      /*
-       * Minta challenge
-       * dari backend kita sendiri.
-       */
-
-      const session =
-        sessionID();
-
-      const challengeResponse =
-        await fetch(
-          "/api/challenge"
-        );
-
-      const challenge =
-        await challengeResponse.json();
-
-      if(
-        !challenge.success
-      ){
-
-        throw new Error(
-          challenge.message ||
-          "Gagal mendapatkan challenge."
-        );
-
-      }
-
-      const ticket =
-        challenge.challenge?.ticket ||
-        challenge.ticket ||
-        challenge.challenge?.data?.ticket;
-
-      if(!ticket){
-
-        throw new Error(
-          "Ticket tidak ditemukan."
-        );
-
-      }
-
-      /*
-       * Kirim reaction
-       * melalui backend.
-       */
-
-      const response =
-        await fetch(
-          "/api/react",
-          {
-            method:"POST",
-
-            headers:{
-              "Content-Type":
-                "application/json"
-            },
-
-            body:JSON.stringify({
-
-              url:postURL,
-
-              reactions:reactions,
-
-              ticket:ticket,
-
-              sessionId:
-                challenge.sessionId ||
-                session
-
-            })
-
-          }
-        );
-
-      const result =
-        await response.json();
-
-      if(
-        !result.success
-      ){
-
-        throw new Error(
-          result.message ||
-          "Gagal mengirim reaksi."
-        );
-
-      }
-
-      showStatus(
-        "✅ " +
-        (
-          result.message ||
-          "Reaksi berhasil dikirim!"
-        ),
-        "success"
-      );
-
-    }catch(error){
-
-      showStatus(
-        "❌ " +
-        (
-          error.message ||
-          "Terjadi kesalahan."
-        ),
-        "error"
-      );
-
-    }finally{
-
-      send.disabled = false;
-
-      loading.classList.remove(
-        "show"
-      );
-
-    }
-
-  }
-);
-
+/* Block pinch-zoom / multi-touch scale */
+document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});
+document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});
+document.addEventListener("gestureend",e=>e.preventDefault(),{passive:false});
+let lastTouchEnd=0;
+document.addEventListener("touchend",e=>{
+  const now=Date.now();
+  if(now-lastTouchEnd<=300)e.preventDefault();
+  lastTouchEnd=now;
+},{passive:false});
 </script>
-
 </body>
 </html>
